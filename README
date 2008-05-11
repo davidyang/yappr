@@ -1,0 +1,7 @@
+nohup java -jar yappr.jar foo
+  where foo is the name of the .properties file without the .properties extension.
+
+/help to get help.
+
+/bin/ps -A -o pid,args | grep java
+

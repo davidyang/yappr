@@ -1,0 +1,8 @@
+ /help    : Show this help.
+ /who     : List who's listening.
+ /jn      : Join the channel.
+ /lv      : Leave the channel. (You can still send but won't receive.)
+ /rec n   : Recall the last n messages.
+ /typ     : Toggle typing notification.
+ /echo    : Toggle echoing of own messages.
+ /delay s : Insert a delay of s milliseconds between transmission to each user. (Active participants receive messages first so the cumulative delay in channels with many users applies mainly to lurkers.)
