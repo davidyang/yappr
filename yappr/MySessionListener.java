@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Random;
 
 import ymsg.network.Session;
 import ymsg.network.event.SessionListener;
@@ -18,8 +19,6 @@ import ymsg.network.event.SessionFriendEvent;
 import ymsg.network.event.SessionNewMailEvent;
 import ymsg.network.event.SessionNotifyEvent;
 import ymsg.support.MessageDecoder;
-
-
 
 public class MySessionListener implements ymsg.network.event.SessionListener {
 
@@ -185,7 +184,16 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 			if(arg != null) {
 				count = Integer.parseInt(arg);
 			}
-			sendReceivedRecentHidden(arg0.getFrom(), count);		
+			sendReceivedRecentHidden(arg0.getFrom(), count);
+		} else if(command.equals("rand")) {
+			int randomNumber;
+			int max = 10;
+			Random generator = new Random();
+			if(arg != null) {
+				max = Integer.parseInt(arg);
+			} 
+			randomNumber = generator.nextInt(max) + 1;
+			relayMsg("", "[User " + arg0.getFrom() + " rolled " + randomNumber + " out of " + max, ymsgSession);
 		} else if(command.equals("typ")) {
 			Daemon.doNotification = !Daemon.doNotification;
 			relayMsg("", "[User "+arg0.getFrom()+" just changed typing notifications to " + Daemon.doNotification + "]", ymsgSession);
@@ -261,6 +269,7 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 			e.printStackTrace();
 		}
 	}
+	
 	private void sendReceivedRecent(String from, int count) {
 		try {
 			int MAXLENGTH = 900;
@@ -289,6 +298,8 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 			e.printStackTrace();
 		}
 	}
+	
+	
 	private void sendReceivedRecentHidden(String from, int count) {
 		try {
 			int MAXLENGTH = 900;
@@ -370,7 +381,6 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 "/delay s : Insert a delay of s milliseconds between transmission to each user.\n"+
 "/hide X  : Place a 'sealed bid'. Don't reveal X till someone types /show.\n"+
 "/show n  : Reveal (to everyone!) the last n hidden messages.\n";
-               
 			ymsgSess.sendMessage(from, helpmsg);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -412,6 +422,7 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 			e.printStackTrace();
 		}
 	}
+	
 	public void offlineMessageReceived(SessionEvent arg0) {
 		// TODO Auto-generated method stub
 		System.out.println(arg0.getFrom() + " " + arg0.getMessage());

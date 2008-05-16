@@ -1,2 +1,3 @@
 # ignore properties files in botprops
 *.properties
+.project
