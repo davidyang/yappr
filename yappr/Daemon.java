@@ -20,7 +20,7 @@ public class Daemon {
 	public static String password = "insecure";
 	public static String userlist = "pegarmpaul,lzhets";
 	
-	public static boolean doNotification = true;
+	public static boolean doNotification = false;	
 	public static int lastSentNotificationType = 0; // 0 = haven't sent out
 													// typing, 1 means currently
 													// set to isTyping
@@ -33,6 +33,9 @@ public class Daemon {
 
 	public static int counter;
 
+	public static MessageStore messageStore = null;
+	public static MessageStore hiddenMessageStore = null;
+	
 	public static String join(String token, String[] strings) {
 		StringBuffer sb = new StringBuffer();
 
@@ -103,15 +106,14 @@ public class Daemon {
 		}
 	}
 
-	public static void addMessage(String user, String msg, int messageId, int is_hidden) {
-
-	}
-
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
+		messageStore = new MessageStore(1000, 20);
+		hiddenMessageStore = new MessageStore(50, 10);
+		
 		String propsFilename = null;
 		if (args.length == 0) {
 			System.out.println("Please provide [instance_name] where instance_name is the first part of your instance_name.properties file");
@@ -154,80 +156,5 @@ public class Daemon {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public static String getMessagesByDate(Date from, Date to) {
-		StringBuilder sb = new StringBuilder();
-		//		
-		// try {
-		//		
-		// PreparedStatement getUsers = conn.prepareStatement("select username,
-		// visible_id, sent_at, msg from messages WHERE sent_at >= ? AND sent_at
-		// <= ? order by sent_at DESC");
-		// getUsers.setTimestamp(1, new java.sql.Timestamp(from.getTime()));
-		// getUsers.setTimestamp(2, new java.sql.Timestamp(to.getTime()));
-		//			
-		// ResultSet rs = getUsers.executeQuery();
-		//			
-		// NumberFormat nf=NumberFormat.getInstance(); // Get Instance of
-		// NumberFormat
-		// nf.setMinimumIntegerDigits(2); // The minimum Digits required is 5
-		// nf.setMaximumIntegerDigits(2); // The maximum Digits required is 5
-		//			
-		// while(rs.next()) {
-		// sb.insert(0, nf.format(rs.getInt("visible_id")) + " <b>" +
-		// rs.getString("username") + "</b>: " + rs.getString("msg") + "<br/>");
-		// }
-		// } catch(Exception e) {
-		// e.printStackTrace();
-		// }
-		//		
-		return sb.toString();
-
-	}
-
-	public static String getRecentMessage(int numMessages) {
-		StringBuilder sb = new StringBuilder();
-
-		// try {
-		// Statement getUsers = conn.createStatement();
-		// getUsers.setMaxRows(numMessages);
-		// ResultSet rs = getUsers.executeQuery("select username, sent_at, msg
-		// from messages order by sent_at DESC");
-		// while(rs.next()) {
-		// sb.insert(0, "<b>" + rs.getString("username") + "</b>> " +
-		// rs.getString("msg") + "\n");
-		// }
-		// } catch(Exception e) {
-		// e.printStackTrace();
-		// }
-
-		return sb.toString();
-
-	}
-
-	public static ArrayList<String> getRecentMsgs(int n, int is_hidden) {
-		ArrayList<String> msgs = new ArrayList<String>();
-
-		NumberFormat nf = NumberFormat.getInstance(); 	// Get Instance of
-														// NumberFormat
-		nf.setMinimumIntegerDigits(2); // The minimum Digits required is 5
-		nf.setMaximumIntegerDigits(2); // The maximum Digits required is 5
-		//		
-		// try {
-		// Statement getUsers = conn.createStatement();
-		// getUsers.setMaxRows(n);
-		// ResultSet rs = getUsers.executeQuery("select username, visible_id,
-		// sent_at, msg from messages WHERE is_hidden=" + is_hidden + " order by
-		// sent_at DESC");
-		// while(rs.next()) {
-		// msgs.add(0, nf.format(rs.getInt("visible_id")) + "
-		// <b>"+rs.getString("username")+"</b>> "+rs.getString("msg")); // add a
-		// 0 to reverse order
-		// }
-		// } catch(Exception e) {
-		// e.printStackTrace();
-		// }
-		return msgs;
 	}
 }

@@ -50,7 +50,7 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 		// TODO Auto-generated method stub
 		System.out.println(arg0.getFrom() + " " + arg0.getMessage());
 
-	}
+	}					
 
 	public void chatUserUpdateReceived(SessionChatEvent arg0) {
 		// TODO Auto-generated method stub
@@ -177,7 +177,7 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 		} else if(command.equals("hide")) {
 			if(arg!= null) {
 				relayMsg(arg0.getFrom(), "["+arg0.getFrom()+" made a hidden statement; do /show X to show (to everyone!) the last X hidden statements]", ymsgSession);
-				Daemon.addMessage(arg0.getFrom(), arg, -1, 1);
+				Daemon.hiddenMessageStore.addMessage(new Message(0, arg0.getFrom(), arg));
 			}
 		} else if(command.equals("show")) {
 			int count = 2;
@@ -193,7 +193,7 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 				max = Integer.parseInt(arg);
 			} 
 			randomNumber = generator.nextInt(max) + 1;
-			relayMsg("", "[User " + arg0.getFrom() + " rolled " + randomNumber + " out of " + max, ymsgSession);
+			relayMsg("", "[User " + arg0.getFrom() + " rolled " + randomNumber + " out of " + max +"]", ymsgSession);
 		} else if(command.equals("typ")) {
 			Daemon.doNotification = !Daemon.doNotification;
 			relayMsg("", "[User "+arg0.getFrom()+" just changed typing notifications to " + Daemon.doNotification + "]", ymsgSession);
@@ -230,7 +230,6 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 			}
 			sendReceivedRecent(arg0.getFrom(), count);
 		} else {
-			
 			NumberFormat nf=NumberFormat.getInstance(); // Get Instance of NumberFormat
 			nf.setMinimumIntegerDigits(2);  // The minimum Digits required is 5
 			nf.setMaximumIntegerDigits(2); // The maximum Digits required is 5
@@ -238,8 +237,7 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 			String number=(nf.format(cur));
 
 			// log it - fourth parameter sets whether or not it's hidden (0 - not hidden, 1 - hidden)
-			Daemon.addMessage(arg0.getFrom(), userMesg, cur, 0);
-			
+			Daemon.messageStore.addMessage(new Message(cur, arg0.getFrom(), userMesg));
 			relayMsg(arg0.getFrom(), "<b>" + number + "</b> " + arg0.getFrom() + "> " + userMesg, ymsgSession);
 		}
 	}
@@ -260,31 +258,31 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 		}
 	}
 
-	private void msgReceivedRecent(String from, int count) {
-		try {
-			Session ses = Daemon.getSession();
-			String msg = Daemon.getRecentMessage(count);
-			ses.sendMessage(from, "[Last " + count + " messages on "+Daemon.getYahooID()+"]\n" + msg);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	private void msgReceivedRecent(String from, int count) {
+//		try {
+//			Session ses = Daemon.getSession();
+//			String msg = Daemon.getRecentMessage(count);
+//			ses.sendMessage(from, "[Last " + count + " messages on "+Daemon.getYahooID()+"]\n" + msg);
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	private void sendReceivedRecent(String from, int count) {
 		try {
 			int MAXLENGTH = 900;
 			ymsg.network.Session ses = Daemon.getSession();
-			ArrayList<String> recent = Daemon.getRecentMsgs(count, 0);
+			ArrayList<Message> recent = Daemon.messageStore.getRecentMessages(count);
 			StringBuffer sb = new StringBuffer();
 			sb.append("[Last "+count+" messages on "+Daemon.getYahooID()+"]\n");
 			int numsent = 0;
-			for (String s : recent) {
-				if (sb.length()+s.length()>MAXLENGTH) {
+			for (Message msg : recent) {
+				if (sb.length()+msg.message.length()>MAXLENGTH) {
 					ses.sendMessage(from, sb.toString());
 					sb.delete(0, sb.length());
 					Thread.sleep(250);
 				}
-				sb.append(s);
+				sb.append(msg.message);
 				sb.append("\n");
 				numsent++;
 			}
@@ -304,17 +302,17 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 		try {
 			int MAXLENGTH = 900;
 			ymsg.network.Session ses = Daemon.getSession();
-			ArrayList<String> recent = Daemon.getRecentMsgs(count, 1);
+			ArrayList<Message> recent = Daemon.hiddenMessageStore.getRecentMessages(count);
 			StringBuffer sb = new StringBuffer();
 			sb.append("[Last "+count+" hidden messages on "+Daemon.getYahooID()+" as requested by "+from+"]\n");
 			int numsent = 0;
-			for (String s : recent) {
-				if (sb.length()+s.length()>MAXLENGTH) {
+			for (Message msg : recent) {
+				if (sb.length()+msg.message.length()>MAXLENGTH) {
 					relayMsg("", sb.toString(), Daemon.getSession());
 					sb.delete(0, sb.length());
 					Thread.sleep(250);
 				}
-				sb.append(s);
+				sb.append(msg.message);
 				sb.append("\n");
 				numsent++;
 			}
