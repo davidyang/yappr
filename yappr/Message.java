@@ -14,4 +14,8 @@ public class Message {
 		this.message = message;
 		timestamp = new Date();
 	}
+	
+	public String getFormattedMessage() {
+		return "<b>" + number + "</b> " + user + "> " + message;
+	}
 }

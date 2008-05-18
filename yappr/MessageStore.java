@@ -22,8 +22,8 @@ public class MessageStore {
 	
 	public ArrayList<Message> getRecentMessages(int num) {
 		// return num recent messages
-		if(num > counter - 1) // can't return more than our memory, probably should throw some kind of exception
-			num = counter - 1;
+		if(num > counter) // can't return more than our memory, probably should throw some kind of exception
+			num = counter;
 		
 		int endIndex = counter - 1;
 		int startIndex = counter - num;

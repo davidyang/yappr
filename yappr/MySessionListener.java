@@ -277,12 +277,12 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 			sb.append("[Last "+count+" messages on "+Daemon.getYahooID()+"]\n");
 			int numsent = 0;
 			for (Message msg : recent) {
-				if (sb.length()+msg.message.length()>MAXLENGTH) {
+				if (sb.length()+msg.getFormattedMessage().length()>MAXLENGTH) {
 					ses.sendMessage(from, sb.toString());
 					sb.delete(0, sb.length());
 					Thread.sleep(250);
 				}
-				sb.append(msg.message);
+				sb.append(msg.getFormattedMessage());
 				sb.append("\n");
 				numsent++;
 			}
@@ -307,12 +307,12 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 			sb.append("[Last "+count+" hidden messages on "+Daemon.getYahooID()+" as requested by "+from+"]\n");
 			int numsent = 0;
 			for (Message msg : recent) {
-				if (sb.length()+msg.message.length()>MAXLENGTH) {
+				if (sb.length()+msg.getFormattedMessage().length()>MAXLENGTH) {
 					relayMsg("", sb.toString(), Daemon.getSession());
 					sb.delete(0, sb.length());
 					Thread.sleep(250);
 				}
-				sb.append(msg.message);
+				sb.append(msg.getFormattedMessage());
 				sb.append("\n");
 				numsent++;
 			}
@@ -388,7 +388,8 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 	public void newMailReceived(SessionNewMailEvent arg0) {
 		// TODO Auto-generated method stub
 		System.out.println(arg0.getFrom() + ": " + arg0.getSubject());
-		relayMsg("", "[Mail: <" + arg0.getFrom() + "> " + arg0.getSubject() + "]", Daemon.getSession());
+		if(arg0.getFrom() != null && arg0.getSubject() != null)
+			relayMsg("", "[Mail: <" + arg0.getFrom() + "> " + arg0.getSubject() + "]", Daemon.getSession());
 	}
 
 	public void notifyReceived(SessionNotifyEvent arg0) {
