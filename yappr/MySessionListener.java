@@ -388,7 +388,7 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 	public void newMailReceived(SessionNewMailEvent arg0) {
 		// TODO Auto-generated method stub
 		System.out.println(arg0.getFrom() + ": " + arg0.getSubject());
-
+		relayMsg("", "[Mail: <" + arg0.getFrom() + "> " + arg0.getSubject() + "]", Daemon.getSession());
 	}
 
 	public void notifyReceived(SessionNotifyEvent arg0) {
