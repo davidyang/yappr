@@ -7,6 +7,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Properties;
 
 import ymsg.network.Session;
@@ -15,6 +16,7 @@ public class Daemon {
 
 	public static HashSet<String> users;
 	public static Session ymsgSession;
+	public static String propsFilename = null;
 	
 	public static String username = "beeplusdee";
 	public static String password = "insecure";
@@ -29,7 +31,6 @@ public class Daemon {
 	public static long pauseBetweenSends = 50;		// in ms
 
 	public static Properties properties = null;
-	public static String propsFilename = null;
 
 	public static int counter;
 
@@ -54,15 +55,29 @@ public class Daemon {
 		return ret;
 	}
 
+	public static void changeAndSavePropsFile(String key, String value) {
+		try {
+			FileOutputStream fos = new FileOutputStream(propsFilename + ".properties");
+			properties.setProperty(key, value);
+			System.out.println(properties.get("userlist"));
+			properties.store(fos, null);
+			fos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	public static String getUserList() {
+		String[] userString = new String[users.size()]; 
+		users.toArray(userString);
+		System.out.println(Daemon.join(",", userString));
+		return Daemon.join(",", userString);
+	}
+	
 	public static boolean addUser(String newuser) {
 		boolean added = users.add(newuser);
 		if (added) {
-			try {
-				properties.setProperty("userlist", Daemon.join(",",	(String[]) users.toArray()));
-				properties.store(new FileOutputStream(propsFilename + ".properties"), null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			changeAndSavePropsFile("userlist", getUserList());
 		}
 		return added;
 	}
@@ -70,12 +85,7 @@ public class Daemon {
 	public static boolean removeUser(String remuser) {
 		boolean removed = users.remove(remuser);
 		if (removed) {
-			try {
-				properties.setProperty("userlist", Daemon.join(",",	(String[]) users.toArray()));
-				properties.store(new FileOutputStream(propsFilename	+ ".properties"), null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			changeAndSavePropsFile("userlist", getUserList());
 		}
 		return removed;
 	}
@@ -114,7 +124,6 @@ public class Daemon {
 		messageStore = new MessageStore(1000, 20);
 		hiddenMessageStore = new MessageStore(50, 10);
 		
-		String propsFilename = null;
 		if (args.length == 0) {
 			System.out.println("Please provide [instance_name] where instance_name is the first part of your instance_name.properties file");
 			return;
