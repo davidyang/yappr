@@ -1,14 +1,15 @@
 package yappr;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Random;
 
 import ymsg.network.Session;
-import ymsg.network.event.SessionListener;
 import ymsg.network.event.SessionChatEvent;
 import ymsg.network.event.SessionConferenceEvent;
 import ymsg.network.event.SessionErrorEvent;
@@ -197,6 +198,17 @@ public class MySessionListener implements ymsg.network.event.SessionListener {
 		} else if(command.equals("typ")) {
 			Daemon.doNotification = !Daemon.doNotification;
 			relayMsg("", "[User "+arg0.getFrom()+" just changed typing notifications to " + Daemon.doNotification + "]", ymsgSession);
+		} else if(command.equals("host")) {
+			String hostname = "";
+		   try {
+		        InetAddress addr = InetAddress.getLocalHost();
+		        // Get IP Address
+		        byte[] ipAddr = addr.getAddress();
+		        // Get hostname
+		        hostname = addr.getHostName();
+		    } catch (UnknownHostException e) {
+		    }
+		    relayMsg("", "[This yappr is running on " + hostname + "]", ymsgSession);
 		} else if(command.equals("echo")) {
 			Daemon.echoMessages = !Daemon.echoMessages;
 			relayMsg("", "[User "+arg0.getFrom()+" just changed echo effect to " + Daemon.echoMessages + "]", ymsgSession);
